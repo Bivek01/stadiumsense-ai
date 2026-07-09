@@ -22,10 +22,11 @@ This project strictly aligns with the core pillars of the Smart Stadiums & Tourn
    ```bash
    npm install
    ```
-2. Create a `.env` file in the project root and add your Gemini API key:
+2. Create a `.env` file in the project root and add your Gemini API key (Note: It is no longer prefixed with `VITE_` because it is securely handled server-side):
    ```env
-   VITE_GEMINI_API_KEY=your_api_key_here
+   GEMINI_API_KEY=your_api_key_here
    ```
+   *The API calls are securely proxied through a Vercel serverless function (`api/gemini.js`), ensuring your API key is never exposed to the client bundle.*
 3. Start the Vite development server:
    ```bash
    npm run dev
