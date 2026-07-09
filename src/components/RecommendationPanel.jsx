@@ -1,9 +1,22 @@
 import React from 'react';
+import { PRIORITIES } from '../data/constants';
 
-export default function RecommendationPanel({ recommendation }) {
+/**
+ * Displays the core routing recommendation output for the fan.
+ * Highlights urgent priorities appropriately with warning colors.
+ * 
+ * @param {Object} props
+ * @param {Object} props.recommendation - The recommendation result from the decision engine.
+ * @param {string} props.recommendation.priority - The priority level ("urgent" | "normal").
+ * @param {string|null} props.recommendation.recommendedGate - The gate recommended for entry.
+ * @param {string} props.recommendation.message - The main directive message to show.
+ * @param {string[]} props.recommendation.tips - An array of contextual tip strings.
+ * @returns {JSX.Element}
+ */
+function RecommendationPanel({ recommendation }) {
   const { priority, recommendedGate, message, tips } = recommendation;
   
-  const isUrgent = priority === 'urgent';
+  const isUrgent = priority === PRIORITIES.URGENT;
   
   const containerClass = isUrgent 
     ? "bg-red-50/80 border-red-200 text-red-900 shadow-lg shadow-red-500/10 border-t-4 border-t-red-500"
@@ -59,3 +72,5 @@ export default function RecommendationPanel({ recommendation }) {
     </div>
   );
 }
+
+export default React.memo(RecommendationPanel);

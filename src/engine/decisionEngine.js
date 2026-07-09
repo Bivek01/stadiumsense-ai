@@ -1,39 +1,51 @@
+import { CROWD_DENSITIES, SPECIAL_NEEDS, WEATHER_CONDITIONS, TICKET_TYPES, PRIORITIES } from '../data/constants.js';
+
 /**
- * Helper to determine numeric value for crowd density
+ * Core Decision Engine module for StadiumSense AI.
+ * 
+ * This module is responsible for analyzing game-day fan contexts and generating
+ * real-time routing recommendations. It processes various factors like crowd density,
+ * time remaining until kickoff, weather conditions, and special needs to calculate
+ * the optimal entry gate and provide actionable tips for the fan.
+ */
+
+/**
+ * Helper to determine numeric value for crowd density.
  * This allows us to sort gates by how busy they are.
  * 
- * @param {string} density - "Low" | "Medium" | "High"
- * @returns {number} Numeric weight (1 for Low, 2 for Medium, 3 for High)
+ * @param {string} density - The current crowd density at a specific gate (e.g., "Low", "Medium", "High").
+ * @returns {number} A numeric weight representing congestion (1 for Low, 2 for Medium, 3 for High).
  */
 const getDensityValue = (density) => {
   switch (density) {
-    case 'Low': return 1;
-    case 'Medium': return 2;
-    case 'High': return 3;
+    case CROWD_DENSITIES.LOW: return 1;
+    case CROWD_DENSITIES.MEDIUM: return 2;
+    case CROWD_DENSITIES.HIGH: return 3;
     default: return 3;
   }
 };
 
 /**
- * Core Decision Engine for StadiumSense AI.
- * Processes fan context and outputs actionable recommendations.
+ * Processes fan context and outputs actionable recommendations based on business rules.
+ * Prioritizes urgent needs first, then identifies the gate with the lowest density,
+ * factoring in proximity to kickoff time, weather, and ticket privileges.
  * 
- * @param {Object} context
- * @param {string} context.ticketType - "VIP" | "General" | "Student"
- * @param {number} context.minutesToMatch - Minutes remaining until kickoff
- * @param {string} context.weather - "Clear" | "Rain" | "ExtremeHeat"
- * @param {Object} context.crowdByZone - Map of gates to density, e.g. { gateA: "Low", gateB: "Medium", ... }
- * @param {string} context.currentZone - Fan's current location zone
- * @param {string} context.specialNeed - "None" | "Medical" | "Mobility" | "LostChild"
- * @returns {Object} - { priority: "normal"|"urgent", recommendedGate: string|null, message: string, tips: string[] }
+ * @param {Object} context - The current state of the fan's situation and environment.
+ * @param {string} context.ticketType - The fan's ticket tier ("VIP", "General", "Student").
+ * @param {number} context.minutesToMatch - Minutes remaining until kickoff time.
+ * @param {string} context.weather - The current weather conditions ("Clear", "Rain", "ExtremeHeat").
+ * @param {Object} context.crowdByZone - Map of gate names to their respective crowd density string.
+ * @param {string} context.currentZone - The fan's current geographic location zone.
+ * @param {string} context.specialNeed - Any special assistance required by the fan.
+ * @returns {{ priority: string, recommendedGate: string|null, message: string, tips: string[] }} An object containing routing priority, recommended gate, a guidance message, and contextual tips.
  */
 export function getRecommendations(context) {
   const { specialNeed, minutesToMatch, weather, crowdByZone, ticketType } = context;
 
   // 1. Evaluate critical override rules first (Urgent needs)
-  if (specialNeed === 'Medical' || specialNeed === 'LostChild') {
+  if (specialNeed === SPECIAL_NEEDS.MEDICAL || specialNeed === SPECIAL_NEEDS.LOST_CHILD) {
     return {
-      priority: 'urgent',
+      priority: PRIORITIES.URGENT,
       recommendedGate: null,
       message: 'Urgent: Please proceed immediately to the nearest help desk or medical point. Staff have been alerted.',
       tips: []
@@ -56,7 +68,7 @@ export function getRecommendations(context) {
   let message = `Proceed to ${recommendedGate} for the fastest entry.`;
 
   // 3. Time-to-match & Congestion logic
-  if (minutesToMatch < 20 && lowestDensity === 'High') {
+  if (minutesToMatch < 20 && lowestDensity === CROWD_DENSITIES.HIGH) {
     // If the "best" gate is still 'High' and kickoff is soon, suggest an alternate approach.
     // In a real world scenario, we'd pick a geographically nearest alternate gate. 
     // Here we pick the next available gate if possible, or fallback to a general message.
@@ -68,19 +80,19 @@ export function getRecommendations(context) {
   }
 
   // 4. Contextual tips based on weather conditions
-  if (weather === 'Rain') {
+  if (weather === WEATHER_CONDITIONS.RAIN) {
     tips.push('Use covered walkways and consider carrying an umbrella.');
-  } else if (weather === 'ExtremeHeat') {
+  } else if (weather === WEATHER_CONDITIONS.EXTREME_HEAT) {
     tips.push('Remember to stay hydrated! Visit the hydration stations near the gates.');
   }
 
   // 5. Contextual tips based on ticket tier
-  if (ticketType === 'VIP') {
+  if (ticketType === TICKET_TYPES.VIP) {
     tips.push('As a VIP, you can use the exclusive VIP lounge fast-entry lane at your gate.');
   }
 
   return {
-    priority: 'normal',
+    priority: PRIORITIES.NORMAL,
     recommendedGate,
     message,
     tips

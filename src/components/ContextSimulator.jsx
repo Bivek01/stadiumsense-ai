@@ -1,6 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { TICKET_TYPES, WEATHER_CONDITIONS, SPECIAL_NEEDS, ZONES, CROWD_DENSITIES, GATES } from '../data/constants';
 
-export default function ContextSimulator({ context, setContext }) {
+/**
+ * Renders the simulation control panel for updating fan context.
+ * 
+ * @param {Object} props
+ * @param {Object} props.context - The current fan context state.
+ * @param {Function} props.setContext - State setter function for the context.
+ * @returns {JSX.Element}
+ */
+function ContextSimulator({ context, setContext }) {
+  const [localMinutes, setLocalMinutes] = useState(context.minutesToMatch);
+
+  useEffect(() => {
+    setLocalMinutes(context.minutesToMatch);
+  }, [context.minutesToMatch]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localMinutes !== context.minutesToMatch) {
+        setContext(prev => ({ ...prev, minutesToMatch: localMinutes }));
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [localMinutes, context.minutesToMatch, setContext]);
   const handleChange = (field, value) => {
     setContext(prev => ({ ...prev, [field]: value }));
   };
@@ -31,9 +54,9 @@ export default function ContextSimulator({ context, setContext }) {
           <div>
             <label htmlFor="ticketType" className={labelClass}>Ticket Type</label>
             <select id="ticketType" className={selectClass} value={context.ticketType} onChange={e => handleChange('ticketType', e.target.value)}>
-              <option value="General">General</option>
-              <option value="VIP">VIP</option>
-              <option value="Student">Student</option>
+              <option value={TICKET_TYPES.GENERAL}>General</option>
+              <option value={TICKET_TYPES.VIP}>VIP</option>
+              <option value={TICKET_TYPES.STUDENT}>Student</option>
             </select>
           </div>
 
@@ -46,8 +69,8 @@ export default function ContextSimulator({ context, setContext }) {
               id="minutesToMatch" 
               min="0" max="120" 
               className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600 mt-3" 
-              value={context.minutesToMatch} 
-              onChange={e => handleChange('minutesToMatch', parseInt(e.target.value, 10))}
+              value={localMinutes} 
+              onChange={e => setLocalMinutes(parseInt(e.target.value, 10))}
             />
             <div className="flex justify-between text-xs text-slate-400 mt-1 font-medium">
               <span>0m (Kickoff)</span>
@@ -58,29 +81,29 @@ export default function ContextSimulator({ context, setContext }) {
           <div>
             <label htmlFor="weather" className={labelClass}>Weather Condition</label>
             <select id="weather" className={selectClass} value={context.weather} onChange={e => handleChange('weather', e.target.value)}>
-              <option value="Clear">Clear</option>
-              <option value="Rain">Rain</option>
-              <option value="ExtremeHeat">Extreme Heat</option>
+              <option value={WEATHER_CONDITIONS.CLEAR}>Clear</option>
+              <option value={WEATHER_CONDITIONS.RAIN}>Rain</option>
+              <option value={WEATHER_CONDITIONS.EXTREME_HEAT}>Extreme Heat</option>
             </select>
           </div>
           
           <div>
             <label htmlFor="currentZone" className={labelClass}>Current Location (Zone)</label>
             <select id="currentZone" className={selectClass} value={context.currentZone} onChange={e => handleChange('currentZone', e.target.value)}>
-              <option value="parking_north">North Parking</option>
-              <option value="transit_station">Transit Station</option>
-              <option value="gateC_plaza">Gate C Plaza</option>
-              <option value="food_court">Food Court</option>
+              <option value={ZONES.PARKING_NORTH}>North Parking</option>
+              <option value={ZONES.TRANSIT_STATION}>Transit Station</option>
+              <option value={ZONES.GATE_C_PLAZA}>Gate C Plaza</option>
+              <option value={ZONES.FOOD_COURT}>Food Court</option>
             </select>
           </div>
           
           <div>
             <label htmlFor="specialNeed" className={labelClass}>Special Needs</label>
             <select id="specialNeed" className={selectClass} value={context.specialNeed} onChange={e => handleChange('specialNeed', e.target.value)}>
-              <option value="None">None</option>
-              <option value="Medical">Medical Emergency</option>
-              <option value="Mobility">Mobility Assistance</option>
-              <option value="LostChild">Lost Child</option>
+              <option value={SPECIAL_NEEDS.NONE}>None</option>
+              <option value={SPECIAL_NEEDS.MEDICAL}>Medical Emergency</option>
+              <option value={SPECIAL_NEEDS.MOBILITY}>Mobility Assistance</option>
+              <option value={SPECIAL_NEEDS.LOST_CHILD}>Lost Child</option>
             </select>
           </div>
         </div>
@@ -94,7 +117,7 @@ export default function ContextSimulator({ context, setContext }) {
           <p className="text-sm text-slate-500 mb-5">Simulate the congestion at each of the stadium entry gates.</p>
           
           <div className="space-y-4">
-            {['gateA', 'gateB', 'gateC', 'gateD'].map(gate => (
+            {[GATES.GATE_A, GATES.GATE_B, GATES.GATE_C, GATES.GATE_D].map(gate => (
               <div key={gate}>
                 <label htmlFor={gate} className="block text-sm font-semibold text-slate-700 mb-1">{gate.replace('gate', 'Gate ')}</label>
                 <select 
@@ -103,9 +126,9 @@ export default function ContextSimulator({ context, setContext }) {
                   value={context.crowdByZone[gate]} 
                   onChange={e => handleCrowdChange(gate, e.target.value)}
                 >
-                  <option value="Low">Low (Smooth Entry)</option>
-                  <option value="Medium">Medium (Moderate Wait)</option>
-                  <option value="High">High (Heavy Congestion)</option>
+                  <option value={CROWD_DENSITIES.LOW}>Low (Smooth Entry)</option>
+                  <option value={CROWD_DENSITIES.MEDIUM}>Medium (Moderate Wait)</option>
+                  <option value={CROWD_DENSITIES.HIGH}>High (Heavy Congestion)</option>
                 </select>
               </div>
             ))}
@@ -115,3 +138,5 @@ export default function ContextSimulator({ context, setContext }) {
     </div>
   );
 }
+
+export default React.memo(ContextSimulator);

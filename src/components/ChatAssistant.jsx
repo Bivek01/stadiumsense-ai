@@ -1,6 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { askAssistant } from '../engine/geminiClient';
 
+/**
+ * Renders the AI Chat Assistant interface, decoupled from the core routing logic.
+ * Handles the conversation state and calls the external LLM API.
+ * 
+ * @param {Object} props
+ * @param {Object} props.context - The current fan context state, used for grounding the AI.
+ * @param {Object} props.recommendation - The latest system recommendation, used for grounding the AI.
+ * @returns {JSX.Element}
+ */
 export default function ChatAssistant({ context, recommendation }) {
   const [messages, setMessages] = useState([
     { role: 'assistant', text: "Hi! I'm StadiumSense AI. Any questions about your route or the stadium?" }

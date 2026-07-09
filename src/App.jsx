@@ -1,7 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, Suspense, lazy } from 'react';
 import ContextSimulator from './components/ContextSimulator';
 import RecommendationPanel from './components/RecommendationPanel';
-import ChatAssistant from './components/ChatAssistant';
+const ChatAssistant = lazy(() => import('./components/ChatAssistant'));
+import ErrorBoundary from './components/ErrorBoundary';
 import { getRecommendations } from './engine/decisionEngine';
 import { normalContext } from './data/mockContext';
 
@@ -36,18 +37,22 @@ function App() {
           </p>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left Column: Controls */}
-          <div className="lg:col-span-8">
-            <ContextSimulator context={context} setContext={setContext} />
+        <ErrorBoundary>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Left Column: Controls */}
+            <div className="lg:col-span-8">
+              <ContextSimulator context={context} setContext={setContext} />
+            </div>
+            
+            {/* Right Column: Output */}
+            <div className="lg:col-span-4 flex flex-col gap-6">
+              <RecommendationPanel recommendation={recommendation} />
+              <Suspense fallback={<div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 text-slate-500 flex justify-center items-center h-[500px]">Loading assistant...</div>}>
+                <ChatAssistant context={context} recommendation={recommendation} />
+              </Suspense>
+            </div>
           </div>
-          
-          {/* Right Column: Output */}
-          <div className="lg:col-span-4 flex flex-col gap-6">
-            <RecommendationPanel recommendation={recommendation} />
-            <ChatAssistant context={context} recommendation={recommendation} />
-          </div>
-        </div>
+        </ErrorBoundary>
         
       </main>
     </div>
