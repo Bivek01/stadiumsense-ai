@@ -15,11 +15,11 @@ export default function ContextSimulator({ context, setContext }) {
     }));
   };
 
-  const selectClass = "mt-1 block w-full rounded-md border-slate-300 py-2 pl-3 pr-10 text-base focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm bg-white border shadow-sm transition-colors";
+  const selectClass = "mt-1 block w-full rounded-xl border-slate-300 py-2.5 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm bg-white border shadow-sm transition-colors";
   const labelClass = "block text-sm font-semibold text-slate-700 mb-1";
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+    <div className="bg-white p-6 rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-200 border-t-4 border-t-indigo-500">
       <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
         <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
         Simulation Parameters
@@ -45,7 +45,7 @@ export default function ContextSimulator({ context, setContext }) {
               type="range" 
               id="minutesToMatch" 
               min="0" max="120" 
-              className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600 mt-3" 
+              className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600 mt-3" 
               value={context.minutesToMatch} 
               onChange={e => handleChange('minutesToMatch', parseInt(e.target.value, 10))}
             />
@@ -86,10 +86,10 @@ export default function ContextSimulator({ context, setContext }) {
         </div>
 
         {/* Live Crowd Densities */}
-        <div className="bg-slate-50 p-5 rounded-xl border border-slate-200">
+        <div className="bg-slate-50 p-6 rounded-xl border border-slate-200">
           <div className="flex items-center gap-2 mb-4">
             <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-            <h3 className="font-bold text-slate-800 tracking-tight">Live Crowd Densities</h3>
+            <h3 className="text-lg font-bold text-slate-900 tracking-tight">Live Crowd Densities</h3>
           </div>
           <p className="text-sm text-slate-500 mb-5">Simulate the congestion at each of the stadium entry gates.</p>
           
